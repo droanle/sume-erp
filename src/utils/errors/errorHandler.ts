@@ -3,6 +3,8 @@ import {AppError} from "@utils/errors/app-error";
 
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    console.log(err);
+    
     if (err instanceof AppError) {
         let message;
 
@@ -13,7 +15,6 @@ const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
         }
 
         return res.status(err.statusCode).send({
-            statusCode: err.statusCode || "Internal server error",
             message: message,
         });
     }

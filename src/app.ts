@@ -1,10 +1,19 @@
 import 'dotenv/config';
 import express from "express";
 import {GroupingProvider} from "gatex-express";
+import Session from "@utils/types/session.types";
 import errorHandler from "@utils/errors/errorHandler";
 
 // Routes
 import auth from '@modules/auth/auth.routes';
+
+declare global {
+    namespace Express {
+        export interface Request {
+            session?: Session | undefined;
+        }
+    }
+}
 
 export async function createApp() {
     const app = express();

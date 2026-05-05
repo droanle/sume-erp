@@ -1,10 +1,10 @@
 # Checklist do Projeto
 
-- [ ] Estrutura de criação de documentação de API
-- [ ] Cadastrar conta
+- [x] Estrutura de criação de documentação de API
+- [x] Cadastrar conta
 - [ ] Criar lista de permissões
 - [ ] Criar Rule
-- [ ] Login
+- [x] Login
 - [ ] Trocar senha
 - [ ] Authenticator de permissão
 - [ ] Organização
