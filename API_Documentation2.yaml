@@ -1,0 +1,181 @@
+openapi: 3.0.3
+info:
+  title: API Sumé ERP Documentation
+  version: 1.0.0
+  description: Esta é a documentação da API do Sumé ERP, um sistema de planejamento e gerenciamento de recursos empresariais. Aqui você encontrará informações sobre os endpoints da API, formatos de requisição e resposta, métodos de autenticação e tratamento de erros, auxiliando desenvolvedores na integração e no uso eficiente da API do Sumé ERP.
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desenvolvimento local
+tags:
+  - name: Auth
+    description: Endpoints relacionados à autenticação e gerenciamento de usuários
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Registrar um novo usuário
+      description: Endpoint para criar uma nova conta de usuário no sistema.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        201:
+          description: Usuário criado com sucesso
+        400:
+          description: Requisição inválida, dados ausentes ou formato incorreto
+        422:
+          description: Email já registrado
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login de usuário
+      description: Endpoint para autenticar um usuário e obter um token de acesso.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+      responses:
+        200:
+          description: Login bem-sucedido, token de acesso retornado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login bem-sucedido"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        400:
+          description: Requisição inválida, dados ausentes ou formato incorreto
+        401:
+          description: Credenciais inválidas
+  /auth/update-password:
+    post:
+      tags:
+        - Auth
+      summary: Atualizar senha do usuário
+      description: Atualiza a senha do usuário autenticado
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "teste@octasystem.com.br"
+      responses:
+        200:
+          description: Email com código de recuperação enviado com sucesso
+        500:
+          description: Erro interno do servidor
+    put:
+      tags:
+        - Auth
+      summary: Confirmar atualização de senha
+      description: Confirma a atualização de senha do usuário autenticado com o código de recuperação enviado por e-mail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  example: "ASH122ARC"
+                newPassword:
+                  type: string
+                  example: "12345678"
+      responses:
+        200:
+          description: Senha atualizada com sucesso
+        500:
+          description: Erro interno do servidor
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Obter informações do usuário na sessão atual
+      description: Retorna as informações do usuário autenticado na sessão atual, utilizando o token de acesso fornecido no login.
+      responses:
+        200:
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        401:
+          description: Token de acesso inválido
+        500:
+          description: Erro interno do servidor
+      security:
+        - userAuth: [ ]
+    put:
+      tags:
+        - Auth
+      summary: Atualizar informações do usuário na sessão atual
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        200:
+          description: Usuário atualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/user'
+        401:
+          description: Token de acesso inválido
+        500:
+          description: Erro interno do servidor
+components:
+  schemas:
+    login:
+      type: "object"
+      properties:
+        email:
+          type: "string"
+          example: "teste@octasystem.com.br"
+        password:
+          type: "string"
+          example: "12345678"
+    user:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          example: "João Silva"
+        email:
+          type: "string"
+          example: "teste@octasystem.com.br"
+        password:
+          type: "string"
+          example: "12345678"
+        phone:
+          type: "string"
+          description: "Sem pontuações, apenas números"
+          example: "12999999999"
+      required:
+        - name
+        - email
+        - password
+  securitySchemes:
+    userAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

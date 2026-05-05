@@ -1,0 +1,31 @@
+# Checklist do Projeto
+
+- [ ] Estrutura de criação de documentação de API
+- [ ] Cadastrar conta
+- [ ] Criar lista de permissões
+- [ ] Criar Rule
+- [ ] Login
+- [ ] Trocar senha
+- [ ] Authenticator de permissão
+- [ ] Organização
+    - [ ] Criar nova organização
+    - [ ] Editar organização
+    - [ ] Deletar permanentemente organização
+    - [ ] Desativar/Ativar organização
+    - [ ] Duplicar organização
+    - [ ] Transferir propriedade de organização
+- [ ] Workspace
+    - [ ] Criar workspace
+    - [ ] Editar workspace
+    - [ ] Deletar permanentemente workspace
+    - [ ] Desativar/Ativar workspace
+    - [ ] Duplicar workspace
+    - [ ] Adicionar integrantes
+    - [ ] Remover integrantes
+- [ ] Convidar Users
+    - [ ] Convidar usuário para organização
+    - [ ] Remover usuário da organização
+    - [ ] Ativar/Desativar usuário da organização
+    - [ ] Aceitar convite para organização
+    - [ ] Recusar convite para organização
+- [ ] Trocar de Organização

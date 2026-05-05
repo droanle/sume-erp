@@ -1,0 +1,122 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/database/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//--- AUTHENTICATION ---
+
+enum UserType {
+  worker
+  client
+  provider
+  integration
+}
+
+model User {
+  id           String  @id @default(uuid())
+  email        String  @unique
+  passwordHash String  @map("password_hash")
+  name         String
+  phone        String?
+  avatarUrl    String? @map("avatar_url")
+
+  status Boolean @default(true)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  type          UserType           @default(worker)
+  workspaces    WorkspaceHasUser[]
+  organizations Organizations[]
+}
+
+// --- PERMISSIONS ---
+
+model Role {
+  id          String  @id @default(uuid())
+  name        String  @unique
+  description String?
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  permissions RoleHasPermission[]
+  users       WorkspaceUserHasRole[]
+}
+
+model RoleHasPermission {
+  id           String @id @default(uuid())
+  roleId       String @map("role_id")
+  permissionId String @map("permission_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+}
+
+model Permission {
+  id   String @id @default(uuid())
+  name String @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  roles RoleHasPermission[]
+}
+
+// --- WORKSPACES ---
+
+model Organizations {
+  id      String @id @default(uuid())
+  ownerId String @map("owner_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  owner      User        @relation(fields: [ownerId], references: [id])
+  workspaces Workspace[]
+}
+
+model Workspace {
+  id             String  @id @default(uuid())
+  name           String
+  description    String?
+  organizationId String  @map("organization_id")
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  users        WorkspaceHasUser[]
+  organization Organizations      @relation(fields: [organizationId], references: [id])
+}
+
+model WorkspaceHasUser {
+  id          String @id @default(uuid())
+  workspaceId String @map("workspace_id")
+  userId      String @map("user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspace Workspace              @relation(fields: [workspaceId], references: [id])
+  user      User                   @relation(fields: [userId], references: [id])
+  rules     WorkspaceUserHasRole[]
+}
+
+model WorkspaceUserHasRole {
+  id              String @id @default(uuid())
+  workspaceUserId String @map("workspace_user_id")
+  roleId          String @map("role_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  workspaceUser WorkspaceHasUser @relation(fields: [workspaceUserId], references: [id])
+  role          Role             @relation(fields: [roleId], references: [id])
+}
