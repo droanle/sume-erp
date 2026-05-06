@@ -1,7 +1,7 @@
 {
   "name": "sume-erp",
   "version": "1.0.0",
-  "description": "",
+  "description": "A simple ERP system built with Node.js, Express, Prisma, and TypeScript.",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

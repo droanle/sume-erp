@@ -8,7 +8,9 @@ servers:
     description: Servidor de desenvolvimento local
 tags:
   - name: Auth
-    description: Endpoints relacionados à autenticação e gerenciamento de usuários
+    description: Autenticação e gerenciamento do acesso ao sistema
+  - name: Access_Control
+    description: Gestão de papéis de acesso e permissões no sistema
 paths:
   /auth/register:
     post:
@@ -59,7 +61,7 @@ paths:
           description: Requisição inválida, dados ausentes ou formato incorreto
         401:
           description: Credenciais inválidas
-  /auth/update-password:
+  /auth/update_password:
     post:
       tags:
         - Auth
@@ -115,7 +117,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/user'
+                allOf:
+                  - $ref: '#/components/schemas/user'
+                  - type: object
+                    properties:
+                      permissions:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/permission'
         401:
           description: Token de acesso inválido
         500:
@@ -141,6 +150,78 @@ paths:
       responses:
         200:
           description: Usuário atualizado
+        401:
+          description: Token de acesso inválido
+        500:
+          description: Erro interno do servidor
+      security:
+        - userAuth: [ ]
+  /access_control/permissions:
+    get:
+      tags:
+        - Access_Control
+      summary: Listar permissões possíveis de terem no sistema
+      description: Retorna uma lista das permissões existentes no sistema
+      parameters:
+        - in: query
+          name: toWorkspaces
+          description: Filtra as permissões relacionadas nível de acesso a workspaces
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: toOrganizations
+          description: Filtra as permissões relacionadas nível de acesso a organizações
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: Permissões listadas com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/permission"
+        401:
+          description: Token de acesso inválido
+        500:
+          description: Erro interno do servidor
+  /access_control/{organizationId}/rules:
+    get:
+      tags:
+        - Access_Control
+      summary: Listar papéis de acesso
+      description: Retorna uma lista dos papéis de acesso existentes no sistema
+      parameters:
+        - in: path
+          name: organizationId
+          schema:
+            type: integer
+          required: true
+          description: Numeric ID of the user to get
+        - in: query
+          name: toWorkspaces
+          description: Filtra as permissões relacionadas nível de acesso a workspaces
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: toOrganizations
+          description: Filtra as permissões relacionadas nível de acesso a organizações
+          schema:
+            type: boolean
+            default: false
+      responses:
+        200:
+          description: Papeis de acesso listadas com sucesso
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/role"
         401:
           description: Token de acesso inválido
         500:
@@ -178,6 +259,24 @@ components:
         - name
         - email
         - password
+    permission:
+      type: "string"
+      example: "create:workspace"
+    role:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 1
+        name:
+          type: "string"
+          example: "Admin"
+        level:
+          type: "string"
+          enum:
+            - unit
+            - workspace
+            - organization
   securitySchemes:
     userAuth:
       type: http
